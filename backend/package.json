@@ -1,0 +1,11 @@
+{
+  "name": "tube-status-backend",
+  "version": "1.0.0",
+  "description": "Pin pusher for Tube Status delay pins",
+  "dependencies": {
+    "express": "4.14.0",
+    "pebble-timeline-js-node": "^1.1.0",
+    "request": "2.74.0",
+    "xmlhttprequest": "1.8.0"
+  }
+}
