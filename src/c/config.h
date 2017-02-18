@@ -3,7 +3,7 @@
 #include <pebble.h>
 
 #define VERBOSE false
-#define VERSION "3.2"
+#define VERSION "3.3"
 
 typedef enum {
   LineTypeBakerloo = 0,

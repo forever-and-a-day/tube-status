@@ -1,6 +1,6 @@
 var config = require('./config.json');
 
-var VERSION = '3.2';
+var VERSION = '3.3';
 var VERBOSE = true;
 var NEW_API = true;
 var TOPIC_PINS = 'delays';
@@ -36,9 +36,9 @@ function request(url, callback) {
 
 function getServerStatus() {
   // Query boot for server IP
-  request(config.BOOT_URL, function(responseText) {
-    var json = JSON.parse(responseText);
-    var ip = json.tube_status;
+  request(config.IP_URL, function(responseText) {
+    var ip_json = JSON.parse(responseText);
+    var ip = ip_json.ip;
 
     request('http://' + ip + ':' + config.PORT + '/status', function(responseTextStatus) {
       Log('getServerStatus(): Status response: ' + responseTextStatus);
