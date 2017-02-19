@@ -1,6 +1,4 @@
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
 while :
 do
-  node $DIR/main.js
+  node /home/pi/servers/tube_status/backend/main.js
 done
