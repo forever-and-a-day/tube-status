@@ -1,15 +1,16 @@
 var express = require('express');
 var request = require('request');
 var timeline = require('pebble-timeline-js-node');
+
 var config = require('./config.json');
+var log = require('./util/log.js');
+var plural = require('./util/plural.js');
 
 /*********************************** Config ***********************************/
 
-var DEBUG = false;  // More logging
 var PUSH_TO_PRODUCTION = true;
 var INTERVAL_MINS = 5;  // Update interval
 var INTERVAL = INTERVAL_MINS * 1000 /* seconds */ * 60 /* minutes */;
-var CACHE_FIRST = true;  // Don't send pins when the server is launched
 var TOPIC_PINS = 'delays';
 var TOPIC_NOTIFS = 'notifs';
 var PIN_ID = 'tube-status-delays';  // We only ever need one pin!
@@ -17,6 +18,7 @@ var STATE_GOOD_SERVICE = 'Good Service';  // TFL string
 
 /************************************* Data ***********************************/
 
+var gCacheFirst = true;  // Don't send pins when the server is launched
 var gCurrentState = [];  // Array of objects describing current line state
 var lastBody = '';
 
@@ -28,32 +30,22 @@ var Line = function(name, state) {
   }
 }
 
-/************************************ Util ************************************/
-
-function always(message) {
-  var dateString = new Date().toString();
-  dateString = dateString.substring(0, dateString.indexOf('GMT') - 1);
-  console.log('[' + dateString + ']: ' + message);
-}
-
-function debug(message) {
-  if(DEBUG) always(message);
-}
-
 /******************************** Feed parsing ********************************/
 
 function pushPin(pin, body) {
-  always('Pushing new pin:\n' + JSON.stringify(pin) + '\n\n');
+  log.verbose('Pushing new pin:\n' + JSON.stringify(pin) + '\n\n');
 
   // Pins only channel
   if(PUSH_TO_PRODUCTION) {
     timeline.insertSharedPin(pin, [TOPIC_PINS], config.API_KEY_PROD, function(responseText) {
-      always('Production pin push result: ' + responseText);
+      log.verbose('Production pin push result: ' + responseText);
     });
   }
   timeline.insertSharedPin(pin, [TOPIC_PINS], config.API_KEY_SANDBOX, function(responseText) {
-    always('Sandbox pin push result: ' + responseText);
+    log.verbose('Sandbox pin push result: ' + responseText);
   });
+
+  plural.post('tube_status__latest', pin.layout.title + ' - ' + pin.layout.body);
 
   // Notifs channel
   pin['updateNotification'] = {
@@ -67,15 +59,15 @@ function pushPin(pin, body) {
       'backgroundColor': '#0000AA'
     }
   }
-  always('Pushing new notif pin:\n' + JSON.stringify(pin) + '\n\n');
+  log.verbose('Pushing new notif pin:\n' + JSON.stringify(pin) + '\n\n');
   
   if(PUSH_TO_PRODUCTION) {
     timeline.insertSharedPin(pin, [TOPIC_NOTIFS], config.API_KEY_PROD, function(responseText) {
-      always('Production pin push result: ' + responseText);
+      log.verbose('Production pin push result: ' + responseText);
     });
   }
   timeline.insertSharedPin(pin, [TOPIC_NOTIFS], config.API_KEY_SANDBOX, function(responseText) {
-    always('Sandbox pin push result: ' + responseText);
+    log.verbose('Sandbox pin push result: ' + responseText);
   });
 }
 
@@ -90,14 +82,14 @@ var allClear = function(newLines) {
 
 function processNewDelays(lines) {
   if(lines.length != gCurrentState.length) {
-    always('Error: Cannot compare lines, lengths are unequal.');
+    log.verbose('Error: Cannot compare lines, lengths are unequal.');
     return;
   }
 
   var body = '';
   for(var i = 0; i < lines.length; i++) {
     if(lines[i].name != gCurrentState[i].name) {
-      always('Error: ' + 'Cannot compare lines, lists are not in sync.');  // Should never happen
+      log.verbose('Error: ' + 'Cannot compare lines, lists are not in sync.');  // Should never happen
       return;
     }
 
@@ -108,7 +100,7 @@ function processNewDelays(lines) {
       if(lines[i].state != gCurrentState[i].state) {
         // Store updated state
         gCurrentState[i].state = lines[i].state;
-        always('Stored new line state: ' + lines[i].toString());
+        log.verbose('Stored new line state: ' + lines[i].toString());
       }
     }
   }     
@@ -117,7 +109,7 @@ function processNewDelays(lines) {
   if(body.length != lastBody.length) {
     // Something changed
     if(allClear(lines)) {
-      always('No delays anymore, pushing all clear.');
+      log.verbose('No delays anymore, pushing all clear.');
       body = 'All delays resolved.';
 
       // Store all-clear body
@@ -137,7 +129,7 @@ function processNewDelays(lines) {
       }, body);
     } else {
       // New delays
-      debug('Delays are: ' + body);
+      log.debug('Delays are: ' + body);
 
       // Store new body
       lastBody = body;
@@ -158,19 +150,19 @@ function processNewDelays(lines) {
     }
   } else {
     // New delay body is the same as before, nothing changed
-    always('No change in status.');
+    log.verbose('No change in status.');
   }
 }
 
 function download() {
   request('https://api.tfl.gov.uk/line/mode/tube/status', function(err, response, body) {
-    debug('Download from unified API complete!');
-    debug(body);
+    log.debug('Download from unified API complete!');
+    // log.debug(body);
 
     if(body.indexOf('DOCTYPE') >= 0) {
       // HTML bad status page
-      console.log('API may be down, ignoring response:');
-      console.log(body);
+      log.error('API may be down, ignoring response:');
+      log.error(body);
       return;
     }
 
@@ -183,14 +175,14 @@ function download() {
       );
       gCurrentState[i] = new Line(lines[i].name, lines[i].state);
     
-      if(CACHE_FIRST) {
-        always('Initial line state: ' + lines[i].toString());
+      if(gCacheFirst) {
+        log.verbose('Initial line state: ' + lines[i].toString());
       }
     }
 
-    if(CACHE_FIRST) {
-      CACHE_FIRST = false;
-      always('Got first line states.');
+    if(gCacheFirst) {
+      gCacheFirst = false;
+      log.verbose('Got first line states.');
       return;
     }
 
@@ -203,11 +195,10 @@ function download() {
 var app = express();
 
 app.set('port', config.PORT);
-app.use(express.static(__dirname + '/public'));
 
 app.get('/status', function(req, res) {
   // Status query
-  always('Status requested.');
+  log.verbose('Status requested.');
 
   res.setHeader('Content-Type', 'text/html');
   res.write('OK\n');
@@ -215,7 +206,9 @@ app.get('/status', function(req, res) {
 });
 
 app.listen(app.get('port'), function() {
-  always('Node app is running at localhost:' + app.get('port'));
+  log.verbose('Node app is running at localhost:' + app.get('port'));
+
+  plural.post('tube_status__latest', 'test');
 
   setInterval(function() {
     download();
