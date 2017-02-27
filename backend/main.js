@@ -208,8 +208,6 @@ app.get('/status', function(req, res) {
 app.listen(app.get('port'), function() {
   log.verbose('Node app is running at localhost:' + app.get('port'));
 
-  plural.post('tube_status__latest', 'test');
-
   setInterval(function() {
     download();
   }, INTERVAL);
