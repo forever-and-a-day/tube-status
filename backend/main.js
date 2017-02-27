@@ -207,6 +207,7 @@ app.get('/status', function(req, res) {
 
 app.listen(app.get('port'), function() {
   log.verbose('Node app is running at localhost:' + app.get('port'));
+  plural.post('tube_status__boot', 'Tube status server booted up!');
 
   setInterval(function() {
     download();
