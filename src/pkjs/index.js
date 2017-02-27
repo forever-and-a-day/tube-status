@@ -1,6 +1,6 @@
 var config = require('./config.json');
 
-var VERSION = '3.3';
+var VERSION = '3.4';
 var VERBOSE = true;
 var NEW_API = true;
 var TOPIC_PINS = 'delays';
