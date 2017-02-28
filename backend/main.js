@@ -3,8 +3,8 @@ var request = require('request');
 var timeline = require('pebble-timeline-js-node');
 
 var config = require('./config.json');
-var log = require('./util/log.js');
-var plural = require('./util/plural.js');
+var log = require('./modules/log.js');
+var plural = require('./modules/plural.js');
 
 /*********************************** Config ***********************************/
 
