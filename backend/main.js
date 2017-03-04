@@ -2,6 +2,7 @@ var express = require('express');
 var request = require('request');
 var timeline = require('pebble-timeline-js-node');
 
+var activityServerClient = require('./modules/activity_server_client.js');
 var config = require('./config.json');
 var log = require('./modules/log.js');
 var plural = require('./modules/plural.js');
@@ -37,11 +38,11 @@ function pushPin(pin, body) {
 
   // Pins only channel
   if(PUSH_TO_PRODUCTION) {
-    timeline.insertSharedPin(pin, [TOPIC_PINS], config.API_KEY_PROD, function(responseText) {
+    timeline.insertSharedPin(pin, [TOPIC_PINS], config.ENV.API_KEY_PROD, function(responseText) {
       log.verbose('Production pin push result: ' + responseText);
     });
   }
-  timeline.insertSharedPin(pin, [TOPIC_PINS], config.API_KEY_SANDBOX, function(responseText) {
+  timeline.insertSharedPin(pin, [TOPIC_PINS], config.ENV.API_KEY_SANDBOX, function(responseText) {
     log.verbose('Sandbox pin push result: ' + responseText);
   });
 
@@ -62,11 +63,11 @@ function pushPin(pin, body) {
   log.verbose('Pushing new notif pin:\n' + JSON.stringify(pin) + '\n\n');
   
   if(PUSH_TO_PRODUCTION) {
-    timeline.insertSharedPin(pin, [TOPIC_NOTIFS], config.API_KEY_PROD, function(responseText) {
+    timeline.insertSharedPin(pin, [TOPIC_NOTIFS], config.ENV.API_KEY_PROD, function(responseText) {
       log.verbose('Production pin push result: ' + responseText);
     });
   }
-  timeline.insertSharedPin(pin, [TOPIC_NOTIFS], config.API_KEY_SANDBOX, function(responseText) {
+  timeline.insertSharedPin(pin, [TOPIC_NOTIFS], config.ENV.API_KEY_SANDBOX, function(responseText) {
     log.verbose('Sandbox pin push result: ' + responseText);
   });
 }
@@ -194,23 +195,23 @@ function download() {
 
 var app = express();
 
-app.set('port', config.PORT);
+function main() {
+  app.get('/status', function(req, res) {
+    log.verbose('Status requested.');
+    activityServerClient.post();
+    res.write('OK\n');
+    res.end();
+  });
 
-app.get('/status', function(req, res) {
-  // Status query
-  log.verbose('Status requested.');
+  app.listen(config.ENV.PORT, function() {
+    log.verbose('Node app is running at localhost:' + config.ENV.PORT);
+    plural.post('tube_status__boot', 'Tube status server booted up!');
 
-  res.setHeader('Content-Type', 'text/html');
-  res.write('OK\n');
-  res.end();
-});
-
-app.listen(app.get('port'), function() {
-  log.verbose('Node app is running at localhost:' + app.get('port'));
-  plural.post('tube_status__boot', 'Tube status server booted up!');
-
-  setInterval(function() {
+    setInterval(function() {
+      download();
+    }, INTERVAL);
     download();
-  }, INTERVAL);
-  download();
-});
+  });
+}
+
+main();
