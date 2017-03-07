@@ -205,7 +205,6 @@ function main() {
 
   app.listen(config.ENV.PORT, function() {
     log.verbose('Node app is running at localhost:' + config.ENV.PORT);
-    plural.post('tube_status__boot', 'Tube status server booted up!');
 
     setInterval(function() {
       download();
