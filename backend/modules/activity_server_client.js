@@ -1,3 +1,5 @@
+// Requires Monitor instance on same box with ACTIVITY_SERVER enabled
+
 var request = require('request');
 
 var config = require('../config.json');
