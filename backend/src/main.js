@@ -2,10 +2,10 @@ var express = require('express');
 var request = require('request');
 var timeline = require('pebble-timeline-js-node');
 
-var activityServerClient = require('./modules/activity_server_client.js');
-var config = require('./config.json');
-var log = require('./modules/log.js');
-var plural = require('./modules/plural.js');
+var activityServerClient = require('./common/activity_server_client.js');
+var config = require('../config.json');
+var log = require('./common/log.js');
+var plural = require('./common/plural.js');
 
 /*********************************** Config ***********************************/
 
