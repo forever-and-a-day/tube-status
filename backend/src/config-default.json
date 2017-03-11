@@ -1,0 +1,25 @@
+{
+  "ENV": {
+    "BOOT_URL": "",
+    "REQUEST_TIMEOUT_MS": 30000,
+    "INSTALL_PATH": "",
+    "API_KEY_PROD": "",
+    "API_KEY_SANDBOX": "",
+    "PORT": 5050,
+    "UPDATE_INTERVAL_MS": 300000,
+    "PUSH_TO_PRODUCTION": true
+  },
+  "LOG": {
+    "APP_NAME": "Tube Status",
+    "LOG_NAME": "tube_status.log",
+    "ENABLED": true,
+    "LEVEL": "info|debug"
+  },
+  "PORTS": {
+    "PLURAL": 5550
+  },
+  "ACTIVITY_SERVER": {
+    "POST": true,
+    "PORT": 5555
+  }
+}
