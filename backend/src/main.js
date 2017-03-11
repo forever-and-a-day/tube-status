@@ -7,6 +7,6 @@ var server = require('./modules/server.js');
   log.verbose('===== Tube Status Backend =====');
   server.setup();
 
-  setInterval(data.download, config.ENV.UPDATE_INTERVAL_MS);
+  setInterval(data.download, config.ENV.UPDATE_INTERVAL_M * 1000 * 60);
   data.download();
 })();
