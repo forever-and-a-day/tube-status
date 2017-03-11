@@ -6,7 +6,7 @@
     "API_KEY_PROD": "",
     "API_KEY_SANDBOX": "",
     "PORT": 5050,
-    "UPDATE_INTERVAL_MS": 300000,
+    "UPDATE_INTERVAL_M": 15,
     "PUSH_TO_PRODUCTION": true
   },
   "LOG": {
