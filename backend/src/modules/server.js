@@ -1,6 +1,6 @@
 var express = require('express');
 
-var activityServerClient = require('../common/activity_server_client.js');
+var ledServerClient = require('../common/led-server-client.js');
 var config = require('../common/config.js');
 var log = require('../common/log.js');
 
@@ -9,13 +9,13 @@ var app = express();
 function setup() {
   app.get('/status', function(req, res) {
     log.verbose('Status requested.');
-    activityServerClient.post();
+    ledServerClient.blink(6, [0, 0, 20]);
     res.write('OK\n');
     res.end();
   });
 
   app.listen(config.ENV.PORT, function() {
-    log.verbose('Node app is running at localhost:' + config.ENV.PORT);
+    log.verbose('Express app is running at localhost:' + config.ENV.PORT);
   });
 }
 
