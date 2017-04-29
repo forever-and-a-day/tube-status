@@ -20,5 +20,10 @@
   },
   "LED_SERVER_CLIENT": {
     "PORT": 5555
+  },
+  "EVT_DAILY": {
+    "OPERATOR_API_KEY": "",
+    "THNG_ID": "",
+    "PROPERTY_KEY": "TubeStatus"
   }
 }
