@@ -6,6 +6,14 @@ var log = require('../common/log.js');
 var plural = require('../common/plural.js');
 var log = require('../common/log.js');
 
+config.requireKeys('data.js', {
+  ENV: {
+    API_KEY_PROD: '',
+    API_KEY_SANDBOX: '',
+    PUSH_TO_PRODUCTION: true
+  }
+});
+
 var TOPIC_PINS = 'delays';
 var TOPIC_NOTIFS = 'notifs';
 var PIN_ID = 'tube-status-delays';  // We only ever need one pin!

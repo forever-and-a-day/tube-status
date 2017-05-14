@@ -5,6 +5,12 @@ var evtDaily = require('../common/evt-daily.js');
 var ledServerClient = require('../common/led-server-client.js');
 var log = require('../common/log.js');
 
+config.requireKeys('server.js', {
+  ENV: {
+    PORT: 5050
+  }
+});
+
 var app = express();
 
 function setup() {
