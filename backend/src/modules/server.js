@@ -1,9 +1,9 @@
-var express = require('express');
+const express = require('express');
 
-var config = require('../common/config.js');
-var evtDaily = require('../common/evt-daily.js');
-var ledServerClient = require('../common/led-server-client.js');
-var log = require('../common/log.js');
+const config = require('../common/config.js');
+const evtDaily = require('../common/evt-daily.js');
+const ledServerClient = require('../common/led-server-client.js');
+const log = require('../common/log.js');
 
 config.requireKeys('server.js', {
   ENV: {
@@ -11,10 +11,10 @@ config.requireKeys('server.js', {
   }
 });
 
-var app = express();
+const app = express();
 
 function setup() {
-  app.get('/status', function(req, res) {
+  app.get('/status', (req, res) => {
     log.verbose('Status requested.');
     ledServerClient.blink(6, [0, 0, 20]);
     evtDaily.increment();
@@ -23,9 +23,11 @@ function setup() {
     res.end();
   });
 
-  app.listen(config.ENV.PORT, function() {
-    log.verbose('Express app is running at localhost:' + config.ENV.PORT);
+  app.listen(config.ENV.PORT, () => {
+    log.verbose(`Express app is running at localhost:${config.ENV.PORT}`);
   });
 }
 
-module.exports.setup = setup;
+module.exports = {
+  setup: setup
+};
