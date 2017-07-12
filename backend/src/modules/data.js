@@ -3,7 +3,7 @@ const timeline = require('pebble-timeline-js-node');
 
 const config = require('../common/config');
 const log = require('../common/log');
-const plural = require('../common/plural');
+const fcm = require('../common/fcm');
 
 config.requireKeys('data.js', {
   ENV: {
@@ -19,13 +19,12 @@ var lastStates = [];    // Array of objects describing current line state
 var lastPinBody = '';
 
 function pushPin(pin) {
-
   // Pins only channel
   const TOPIC_PINS = 'delays';
   log.info(`Pushing new pin:\n${JSON.stringify(pin)}\n\n`);
-  timeline.insertSharedPin(pin, [TOPIC_PINS], config.ENV.API_KEY_PROD, log.info);
-  timeline.insertSharedPin(pin, [TOPIC_PINS], config.ENV.API_KEY_SANDBOX, log.info);
-  plural.post('tube_status__latest', `${pin.layout.title} - ${pin.layout.body}`);
+  timeline.insertSharedPin(pin, [ TOPIC_PINS ], config.ENV.API_KEY_PROD, log.info);
+  timeline.insertSharedPin(pin, [ TOPIC_PINS ], config.ENV.API_KEY_SANDBOX, log.info);
+  fcm.post('Tube Status', 'tube_status__latest', `${pin.layout.title} - ${pin.layout.body}`);
 
   // Notifs channel
   pin.updateNotification = {
@@ -42,8 +41,8 @@ function pushPin(pin) {
   
   const TOPIC_NOTIFS = 'notifs';
   log.info(`Pushing new notif pin:\n${JSON.stringify(pin)}\n\n`);
-  timeline.insertSharedPin(pin, [TOPIC_NOTIFS], config.ENV.API_KEY_PROD, log.info);
-  timeline.insertSharedPin(pin, [TOPIC_NOTIFS], config.ENV.API_KEY_SANDBOX, log.info);
+  timeline.insertSharedPin(pin, [ TOPIC_NOTIFS ], config.ENV.API_KEY_PROD, log.info);
+  timeline.insertSharedPin(pin, [ TOPIC_NOTIFS ], config.ENV.API_KEY_SANDBOX, log.info);
 }
 
 function buildBody(lines) {
