@@ -1,7 +1,7 @@
-const api = require('./modules/api.js');
 const config = require('./common/config.js');
 const data = require('./modules/data.js');
 const log = require('./common/log.js');
+const server = require('../common/server');
 
 config.requireKeys('main.js', {
   ENV: {
@@ -11,7 +11,7 @@ config.requireKeys('main.js', {
 
 (() => {
   log.begin();
-  api.setup();
+  server.start();
 
   setInterval(data.download, config.ENV.UPDATE_INTERVAL_M * 1000 * 60);
   data.download();

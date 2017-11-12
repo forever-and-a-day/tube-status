@@ -142,6 +142,4 @@ function download() {
   });
 }
 
-module.exports = {
-  download: download
-};
+module.exports = { download };
