@@ -1,9 +1,9 @@
 const request = require('request');
 const timeline = require('pebble-timeline-js-node');
 
-const config = require('../common/config');
-const log = require('../common/log');
-const fcm = require('../common/fcm');
+const config = require('../node-common').config();
+const log = require('../node-common').log();
+const fcm = require('../node-common').fcm();
 
 config.requireKeys('data.js', {
   ENV: {
