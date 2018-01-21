@@ -6,9 +6,15 @@ const log = require('../node-common').log();
 const fcm = require('../node-common').fcm();
 
 config.requireKeys('data.js', {
-  ENV: {
-    API_KEY_PROD: '',
-    API_KEY_SANDBOX: ''
+  required: [ 'ENV' ],
+  type: 'object', properties: {
+    ENV: {
+      required: [ 'API_KEY_PROD', 'API_KEY_SANDBOX' ],
+      type: 'object', properties: {
+        API_KEY_PROD: { type: 'string' },
+        API_KEY_SANDBOX: { type: 'string' }
+      }
+    }
   }
 });
 

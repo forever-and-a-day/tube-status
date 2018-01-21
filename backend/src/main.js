@@ -4,8 +4,14 @@ const log = require('./node-common').log();
 const mbus = require('./node-common').mbus();
 
 config.requireKeys('main.js', {
-  ENV: {
-    UPDATE_INTERVAL_M: 15
+  required: [ 'ENV' ],
+  type: 'object', properties: {
+    ENV: {
+      required: [ 'UPDATE_INTERVAL_M' ],
+      type: 'object', properties: {
+        UPDATE_INTERVAL_M: { type: 'number' }
+      }
+    }
   }
 });
 
